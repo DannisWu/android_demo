@@ -22,11 +22,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="开始"
-        android:id="@+id/button"
-        android:layout_marginBottom="124dp"
+        android:text="客户端"
+        android:id="@+id/buttonClient"
+        android:layout_marginBottom="119dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_toRightOf="@+id/textView_port"
+        android:layout_toEndOf="@+id/textView_port" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -55,4 +56,13 @@
         android:layout_below="@+id/editText_ip"
         android:layout_alignLeft="@+id/editText_ip"
         android:layout_alignStart="@+id/editText_ip" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="服务器"
+        android:id="@+id/buttonServer"
+        android:layout_alignTop="@+id/buttonClient"
+        android:layout_alignRight="@+id/editText_port"
+        android:layout_alignEnd="@+id/editText_port" />
 </RelativeLayout>

@@ -36,13 +36,19 @@ public class MulticastClient {
     }
 
     private class MulticastClientReceiver implements Runnable {
+        private String mAddress;
+        private int mPort;
         private MulticastSocket mSocket;
         private InetAddress mGroup;
 
         public MulticastClientReceiver(String server, int port) {
             try {
+                mAddress = server;
+                mPort = port;
                 mSocket = new MulticastSocket(port);
                 mGroup = InetAddress.getByName(server);
+                mSocket.joinGroup(mGroup);
+                Log.d(TAG, "MulticastClientReceiver: JoinGroup done(" + mAddress + ", " + mPort + ")");
             } catch (IOException ioe) {
                 Log.e(TAG, "MulticastClientReceiver: creating multicast socket: ", ioe);
                 ioe.printStackTrace();
@@ -52,10 +58,7 @@ public class MulticastClient {
         @Override
         public void run() {
             try {
-                mSocket.joinGroup(mGroup);
-                Log.d(TAG, "MulticastClientReceiver: JoinGroup done");
-
-                byte[] buf = new byte[256];
+                byte[] buf = new byte[512];
                 while (true) {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     mSocket.receive(packet);

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 public class Main2Activity extends AppCompatActivity {
     private MulticastClient mMulticastClient;
+    private MulticastServer mMulticastServer;
     //private ScrollView mScrollView;
 
     @Override
@@ -19,12 +20,17 @@ public class Main2Activity extends AppCompatActivity {
         Bundle mBundle = mIntent.getBundleExtra("bundle");
         String ip = mBundle.getString("IP");
         String port = mBundle.getString("Port");
+        int type = mBundle.getInt("type");
 
         TextView mTextViewHello = (TextView)findViewById(R.id.textView_hello);
-        mTextViewHello.setText("Start Multicast Test(" + ip + ":" + port + ")");
+        mTextViewHello.setText("Start Multicast Test(" + ip + ":" + port + ", " + type + ")");
 
         //mScrollView = (ScrollView)findViewById(R.id.scrollView);
 
-        mMulticastClient = new MulticastClient(ip, Integer.parseInt(port));
+        if (type == 1) {
+            mMulticastClient = new MulticastClient(ip, Integer.parseInt(port));
+        } else if (type == 2) {
+            mMulticastServer = new MulticastServer(ip, Integer.parseInt(port));
+        }
     }
 }
