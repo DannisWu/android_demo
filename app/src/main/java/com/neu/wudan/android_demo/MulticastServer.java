@@ -13,9 +13,21 @@ import java.net.SocketException;
  */
 public class MulticastServer {
     private static String TAG = MulticastServer.class.getSimpleName();
+    private StringBuilder mRunLog = new StringBuilder();
+    private boolean isExit = false;
 
     public MulticastServer(String address, int port) {
+        new Thread(new MulticastServerSender(address, port)).start();
+    }
 
+    public void stopMulticastServer() {
+        Log.d(TAG, "stopMulticastServer()");
+        isExit = true;
+        Log.d(TAG, "stopMulticastServer() isExit = " + isExit);
+    }
+
+    public String getRunLog() {
+        return mRunLog.toString();
     }
 
     private class MulticastServerSender implements Runnable {
@@ -31,6 +43,8 @@ public class MulticastServer {
                 mSocket = new MulticastSocket(port);
                 mGroup = InetAddress.getByName(server);
                 mSocket.joinGroup(mGroup);
+
+                mRunLog.append("JoinGroup done(" + mAddress + ", " + mPort + ")");
                 Log.d(TAG, "JoinGroup done(" + mAddress + ", " + mPort + ")");
             } catch (IOException ioe) {
                 Log.e(TAG, "creating multicast socket: ", ioe);
@@ -43,9 +57,11 @@ public class MulticastServer {
             try {
                 byte[] buf = "Hello I am MulticastSender".getBytes();
                 DatagramPacket packet = new DatagramPacket(buf, buf.length, mGroup, mPort);
-                while (true) {
+                while (isExit == false) {
+                    //mRunLog.append("Send: Hello I am MulticastSender");
                     mSocket.send(packet);
                     Thread.sleep(1000);
+                    Log.d(TAG, "isExit = " + isExit);
                 }
             } catch (SocketException se) {
                 Log.e(TAG, "Error creating socket: ", se);

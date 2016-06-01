@@ -1,7 +1,5 @@
 package com.neu.wudan.android_demo;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,9 +13,19 @@ import java.net.SocketException;
  */
 public class MulticastClient {
     private static String TAG = MulticastClient.class.getSimpleName();
+    private StringBuilder mRunLog = new StringBuilder();
+    private Boolean isExit = false;
 
     public MulticastClient(String server, int port) {
         new Thread(new MulticastClientReceiver(server, port)).start();
+    }
+
+    public String getRunLog() {
+        return mRunLog.toString();
+    }
+
+    public void stopMulticastClient() {
+        isExit = true;
     }
 
     private String getHexString(byte[] b, int lenth) {
@@ -48,6 +56,8 @@ public class MulticastClient {
                 mSocket = new MulticastSocket(port);
                 mGroup = InetAddress.getByName(server);
                 mSocket.joinGroup(mGroup);
+
+                mRunLog.append("MulticastClientReceiver: JoinGroup done(" + mAddress + ", " + mPort + ")");
                 Log.d(TAG, "MulticastClientReceiver: JoinGroup done(" + mAddress + ", " + mPort + ")");
             } catch (IOException ioe) {
                 Log.e(TAG, "MulticastClientReceiver: creating multicast socket: ", ioe);
@@ -59,11 +69,13 @@ public class MulticastClient {
         public void run() {
             try {
                 byte[] buf = new byte[512];
-                while (true) {
+                while (isExit == false) {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     mSocket.receive(packet);
 
-                    Log.d(TAG, "MulticastClientReceiver: " + getHexString(buf, buf.length));
+
+                    mRunLog.append("MulticastClientReceiver: " + packet.getSocketAddress().toString() + " data:" + getHexString(packet.getData(), packet.getLength()));
+                    Log.d(TAG, "MulticastClientReceiver: " + packet.getSocketAddress().toString() + " data:" + getHexString(packet.getData(), packet.getLength()));
                 }
             } catch (SocketException se) {
                 Log.e(TAG, "MulticastClientReceiver: Error creating socket: ", se);
